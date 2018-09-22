@@ -1,6 +1,12 @@
 package io.axoniq.labs.chat.query.rooms.summary;
 
+import io.axoniq.labs.chat.coreapi.ParticipantJoinedRoomEvent;
+import io.axoniq.labs.chat.coreapi.ParticipantLeftRoomEvent;
+import io.axoniq.labs.chat.coreapi.RoomCreatedEvent;
+import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
+
+import java.util.function.Consumer;
 
 @Component
 public class RoomSummaryProjection {
@@ -11,7 +17,26 @@ public class RoomSummaryProjection {
         this.roomSummaryRepository = roomSummaryRepository;
     }
 
-    // TODO: Create some event handlers that update this model when necessary
+    @EventHandler
+    public void on(RoomCreatedEvent evt) {
+        roomSummaryRepository.save(new RoomSummary(evt.getRoomId(), evt.getName()));
+    }
+
+    @EventHandler
+    public void on(ParticipantJoinedRoomEvent evt) {
+        updateRoom(evt.getRoomId(), RoomSummary::addParticipant);
+    }
+
+    @EventHandler
+    public void on(ParticipantLeftRoomEvent evt) {
+        updateRoom(evt.getRoomId(), RoomSummary::removeParticipant);
+    }
+
+    private void updateRoom(String roomId, Consumer<RoomSummary> action) {
+        final RoomSummary room = roomSummaryRepository.findByRoomId(roomId);
+        action.accept(room);
+        roomSummaryRepository.save(room);
+    }
 
     // TODO: Create the query handler to read data from this model
 
