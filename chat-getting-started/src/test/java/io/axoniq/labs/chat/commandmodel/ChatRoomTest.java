@@ -23,9 +23,18 @@ public class ChatRoomTest {
     @Test
     public void testJoinChatRoom() throws Exception {
         testFixture.given(new RoomCreatedEvent("roomId", "testroom"))
-                   .when(new JoinRoomCommand("participant", "roomId"))
-                   .expectEvents(new ParticipantJoinedRoomEvent("participant", "roomId"));
+                .when(new JoinRoomCommand("participant", "roomId"))
+                .expectEvents(new ParticipantJoinedRoomEvent("participant", "roomId"));
     }
+
+    @Test
+    public void testJoinChatRoom_aggregateIdentifierShouldRouteEvents() throws Exception {
+        testFixture.given(new RoomCreatedEvent("roomId1", "testroom"),
+                new RoomCreatedEvent("roomId2", "testroom2"))
+                .when(new JoinRoomCommand("participant", "roomId2"))
+                .expectEvents(new ParticipantJoinedRoomEvent("participant", "roomId2"));
+    }
+
     @Test
     public void testPostMessage() throws Exception {
         testFixture.given(new RoomCreatedEvent("roomId", "testroom"),

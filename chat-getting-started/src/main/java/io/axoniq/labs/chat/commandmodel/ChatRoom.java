@@ -63,7 +63,6 @@ public class ChatRoom {
 
     @EventSourcingHandler
     public void on(ParticipantJoinedRoomEvent evt) {
-        // todo: should this check for a matching roomId or will we only receive proper roomIds due to the aggregateIdentifier?
         this.participantIds.add(evt.getParticipant());
     }
 
