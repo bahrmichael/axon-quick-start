@@ -1,5 +1,9 @@
 package io.axoniq.labs.chat.restapi;
 
+import io.axoniq.labs.chat.coreapi.CreateRoomCommand;
+import io.axoniq.labs.chat.coreapi.JoinRoomCommand;
+import io.axoniq.labs.chat.coreapi.LeaveRoomCommand;
+import io.axoniq.labs.chat.coreapi.PostMessageCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -22,26 +28,22 @@ public class CommandController {
 
     @PostMapping("/rooms")
     public Future<String> createChatRoom(@RequestBody @Valid Room room) {
-        // TODO: Send a command for this API call
-        throw new UnsupportedOperationException("Not implemented yet");
+        return commandGateway.send(new CreateRoomCommand(UUID.randomUUID().toString(), room.getName()));
     }
 
     @PostMapping("/rooms/{roomId}/participants")
     public Future<Void> joinChatRoom(@PathVariable String roomId, @RequestBody @Valid Participant participant) {
-        // TODO: Send a command for this API call
-        throw new UnsupportedOperationException("Not implemented yet");
+        return commandGateway.send(new JoinRoomCommand(participant.getName(), roomId));
     }
 
     @PostMapping("/rooms/{roomId}/messages")
     public Future<Void> postMessage(@PathVariable String roomId, @RequestBody @Valid PostMessageRequest message) {
-        // TODO: Send a command for this API call
-        throw new UnsupportedOperationException("Not implemented yet");
+        return commandGateway.send(new PostMessageCommand(message.getParticipant(), roomId, message.getMessage()));
     }
 
     @DeleteMapping("/rooms/{roomId}/participants")
     public Future<Void> leaveChatRoom(@PathVariable String roomId, @RequestBody @Valid Participant participant) {
-        // TODO: Send a command for this API call
-        throw new UnsupportedOperationException("Not implemented yet");
+        return commandGateway.send(new LeaveRoomCommand(participant.getName(), roomId));
     }
 
     public static class PostMessageRequest {
