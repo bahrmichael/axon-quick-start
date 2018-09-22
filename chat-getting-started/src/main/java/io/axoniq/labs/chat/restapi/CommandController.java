@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.UUID;
+import java.util.concurrent.Future;
 
 @RestController
 public class CommandController {
