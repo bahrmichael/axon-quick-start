@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 
 @Component
@@ -27,14 +28,13 @@ public class ChatMessageProjection {
 
     @EventHandler
     public void on(MessagePostedEvent evt, @Timestamp Instant timestamp) {
-        repository.save(new ChatMessage(evt.getParticipant(), evt.getRoomId(), evt.getMessage(), timestamp.toEpochMilli()));
+        final ChatMessage chatMessage = new ChatMessage(evt.getParticipant(), evt.getRoomId(), evt.getMessage(), timestamp.toEpochMilli());
+        repository.save(chatMessage);
+        updateEmitter.emit(RoomMessagesQuery.class, Objects::nonNull, chatMessage);
     }
 
     @QueryHandler
     public List<ChatMessage> on(RoomMessagesQuery query) {
         return repository.findAllByRoomIdOrderByTimestamp(query.getRoomId());
     }
-
-    // TODO: Emit updates when new message arrive to notify subscription query by modifying the event handler
-
 }
